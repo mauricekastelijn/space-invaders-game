@@ -1,0 +1,13 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {Game} from '../dist/engine.js';
+const make=()=>{const g=new Game({random:()=>.5});g.start();return g;};
+test('starts a fresh game and moves within boundaries',()=>{const g=make();assert.equal(g.aliens.length,32);for(let i=0;i<200;i++)g.step(.04,{move:1});assert.equal(g.player.x,95);for(let i=0;i<200;i++)g.step(.04,{move:-1});assert.equal(g.player.x,5);g.score=300;g.start();assert.equal(g.score,0);assert.equal(g.lives,3);});
+test('pause freezes timers and position',()=>{const g=make();g.pause();const time=g.time;g.step(.04,{move:1,fire:true});assert.equal(g.time,time);assert.equal(g.player.x,50);assert.equal(g.bullets.length,0);g.resume();g.step(.04,{move:1});assert.ok(g.player.x>50);});
+test('friendly laser hits alien and awards points',()=>{const g=make();g.shields=[];const a=g.aliens[24];g.bullets=[{x:a.x,y:a.y+4,vy:-110,friendly:true}];g.step(.04);assert.equal(a.alive,false);assert.equal(g.score,10);assert.equal(g.bullets.length,0);});
+test('shields absorb shots and lose blocks',()=>{const g=make();const s=g.shields.find(s=>s.y>110);const before=g.shields.filter(s=>s.alive).length;g.bullets=[{x:s.x,y:s.y+3,vy:-110,friendly:true}];g.step(.04);assert.ok(g.shields.filter(s=>s.alive).length<before);assert.equal(g.bullets.length,0);});
+test('three hits end game and grace period prevents double hits',()=>{const g=make();g.invincible=0;g.hit();g.hit();assert.equal(g.lives,2);g.invincible=0;g.hit();g.invincible=0;g.hit();assert.equal(g.mode,'over');assert.equal(g.lives,0);});
+test('clearing a wave advances difficulty and restores shields',()=>{const g=make();g.aliens.forEach(a=>a.alive=false);g.step(.04);assert.ok(g.nextWave>0);for(let i=0;i<50;i++)g.step(.04);assert.equal(g.wave,2);assert.equal(g.aliens.length,32);});
+test('enemy reaches defense line, game ends',()=>{const g=make();g.aliens[0].y=120;g.step(.04);assert.equal(g.mode,'over');});
+test('bonus UFO awards 150 points',()=>{const g=make();g.shields=[];g.ufo={x:50,y:12};g.bullets=[{x:50,y:15,vy:-110,friendly:true}];g.step(.04);assert.equal(g.score,150);assert.equal(g.ufo,null);});
+test('long deterministic simulation remains bounded',()=>{const g=make();for(let i=0;i<10000;i++){g.step(.016,{move:Math.sin(i/80),fire:true});assert.ok(Number.isFinite(g.player.x));assert.ok(g.bullets.length<100);if(g.mode==='over')g.start();}});
