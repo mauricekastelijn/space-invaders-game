@@ -4,7 +4,7 @@
 
 **[Play Space Invaders in your browser](https://mauricekastelijn.github.io/space-invaders-game/)**
 
-A mobile-first Space Invaders recreation built with **Three.js 0.186.1**. Play directly on your phone or desktop; no installation is needed. The public play link becomes available after GitHub Pages is enabled and the first deployment succeeds.
+A mobile-first Space Invaders recreation built with **Three.js 0.186.1**. Play directly on your phone or desktop; no installation is needed. The play link opens the game automatically.
 
 ## How to play
 
@@ -60,10 +60,11 @@ npm run build
 python3 -m http.server 8080 --directory _site
 ```
 
-The build copies the validated release from `dist/` to `_site/` and adds `.nojekyll`. All URLs are relative, so the game works under the repository's `/space-invaders-game/` path. Three.js is included locally with its MIT license.
+The build copies the validated game into `_site/dist/`, adds a root `index.html` that opens the game, and adds `.nojekyll`. The repository root has the same launcher, so branch-based Pages publishing also opens the game rather than rendering this README. All URLs are relative, so the game works under the repository's `/space-invaders-game/` path. Three.js is included locally with its MIT license.
 
 ## Project layout
 
+- `index.html` — root launcher that opens the game in `dist/`.
 - `dist/` — game source and standalone playable assets; edit these files.
 - `dist/engine.js` — simulation and collision logic, independent of rendering.
 - `dist/game.js` — Three.js rendering, touch/keyboard controls, synthesized sound.

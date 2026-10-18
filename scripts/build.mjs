@@ -14,6 +14,7 @@ for (const file of required) {
 }
 await rm(output, { recursive: true, force: true });
 await mkdir(output, { recursive: true });
-await cp(source, output, { recursive: true });
+await cp(source, path.join(output, 'dist'), { recursive: true });
+await cp(path.join(root, 'index.html'), path.join(output, 'index.html'));
 await writeFile(path.join(output, '.nojekyll'), '');
 console.log('Built standalone GitHub Pages release in _site/');
