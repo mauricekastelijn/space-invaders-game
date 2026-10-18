@@ -1,46 +1,76 @@
 # Space Invaders · Neon Arcade
 
-A complete mobile-first Space Invaders recreation using **Three.js 0.186.1**, with original procedural voxel sprites. No original game artwork or audio is included.
+[![Build and deploy game](https://github.com/mauricekastelijn/space-invaders-game/actions/workflows/deploy.yml/badge.svg)](https://github.com/mauricekastelijn/space-invaders-game/actions/workflows/deploy.yml)
 
-## Play
+**[Play Space Invaders in your browser](https://mauricekastelijn.github.io/space-invaders-game/)**
 
-Open the hosted game: https://maurice-space-invaders.arcanepeony36.chatgpt.site (owner sign-in required).
+A mobile-first Space Invaders recreation built with **Three.js 0.186.1**. Play directly on your phone or desktop; no installation is needed. The public play link becomes available after GitHub Pages is enabled and the first deployment succeeds.
 
-- **Phone:** hold ◀ / ▶, or drag anywhere on the playfield to steer. Autofire starts enabled; toggle it to fire manually with FIRE.
-- **Desktop:** ← / → or A / D to steer, Space to shoot, P / Escape to pause.
-- Tap SOUND OFF to enable synthesized arcade sound.
-- Three lives, destructible shields, bonus UFOs, accelerating formations, endless waves and a local best score.
-- Switching tabs or apps pauses the game automatically. Both portrait and landscape layouts are supported.
+## How to play
+
+Defend Earth by clearing each alien wave. Shoot the bonus UFO for 150 points. Your shields absorb both your shots and enemy fire, and wear down as they are hit. You have three lives; the mission ends when you lose them or the aliens reach your ship. Each wave gets faster. Your best score is saved on your device.
+
+1. Tap **START MISSION**.
+2. On a **phone**, hold **◀ / ▶** to move, or drag across the playfield to steer.
+3. **AUTO FIRE** is on by default. Turn it off if you prefer to hold **FIRE** yourself.
+4. Tap **SOUND OFF** to enable arcade sound, and **Ⅱ** to pause.
+5. After game over, tap **PLAY AGAIN** for a fresh run.
+
+| Desktop key | Action |
+| --- | --- |
+| Left / Right arrows or A / D | Move |
+| Space | Fire (hold for repeated shots) |
+| P or Escape | Pause / resume |
+
+The game supports portrait and landscape layouts. Switching tabs or apps automatically pauses the mission; tap **RESUME MISSION** when you return. Use a modern browser with WebGL enabled.
+
+## Automatic builds and deployment
+
+[GitHub Actions](https://github.com/mauricekastelijn/space-invaders-game/actions/workflows/deploy.yml) runs the following on every push to `main`:
+
+1. Check JavaScript syntax.
+2. Run the gameplay tests.
+3. Build the standalone release into `_site/`.
+4. Upload the release and deploy it to **GitHub Pages**.
+
+Pull requests run the same checks and build without publishing. You can also launch a deployment from **Actions → Build and deploy game → Run workflow**. Deployment runs only after all checks pass. No personal access token, third-party hosting service, or npm dependency installation is required.
+
+### One-time Pages setup
+
+In [repository Settings → Pages](https://github.com/mauricekastelijn/space-invaders-game/settings/pages), set **Build and deployment → Source → GitHub Actions**. Then run the workflow, or push a commit to `main`. Once its deployment succeeds, the play link above is live and later pushes update it automatically.
 
 ## Run locally
+
+With Python 3:
 
 ```sh
 python3 -m http.server 8080 --directory dist
 ```
 
-Visit http://localhost:8080. Use a web server rather than opening index.html directly because the game uses ES modules. No build, API keys or package installation is required; Three.js is vendored with its MIT license.
+Open http://localhost:8080. Serve the files over HTTP rather than opening `index.html` directly because the game uses JavaScript modules.
 
-## Verify
+## Test and build locally
 
-With Node.js 20 or later:
+With Node.js 22:
 
 ```sh
-npm test
 npm run check
+npm test
+npm run build
+python3 -m http.server 8080 --directory _site
 ```
 
-The game engine is independent of rendering and has deterministic tests covering movement, pause, collisions, shields, lives, UFOs, wave advancement and extended simulation.
+The build copies the validated release from `dist/` to `_site/` and adds `.nojekyll`. All URLs are relative, so the game works under the repository's `/space-invaders-game/` path. Three.js is included locally with its MIT license.
 
-## Deploy on GitHub Pages
+## Project layout
 
-In repository **Settings → Pages**, choose **Deploy from a branch**, branch `main`, folder `/docs`, then save. The `docs/` folder contains the same standalone release as `dist/`. Alternatively serve `dist/` on any static HTTPS host. The included `.openai/hosting.json` applies only to the hosted ChatGPT Site.
+- `dist/` — game source and standalone playable assets; edit these files.
+- `dist/engine.js` — simulation and collision logic, independent of rendering.
+- `dist/game.js` — Three.js rendering, touch/keyboard controls, synthesized sound.
+- `scripts/build.mjs` — dependency-free release build.
+- `tests/` — deterministic gameplay tests.
+- `.github/workflows/deploy.yml` — automatic checks, build and Pages deployment.
+- `docs/` — original release snapshot; the Actions workflow publishes `_site/`, not this folder.
+- `.openai/hosting.json` — configuration for the separate ChatGPT-hosted copy.
 
-## Files
-
-- `dist/` — standalone playable release
-- `docs/` — GitHub Pages release
-- `dist/engine.js` — simulation and collision logic
-- `dist/game.js` — Three.js rendering, input and synthesized sound
-- `tests/` — Node.js engine tests
-
-Best scores stay in browser local storage. Sound is off until enabled. Touch input uses Pointer Events and the renderer caps device pixel ratio at 2 to limit GPU load. A WebGL-capable modern browser is required.
+Original procedural sprites and synthesized sounds are used; original Space Invaders artwork and audio are not included. Best scores remain in your browser's local storage.
